@@ -115,21 +115,111 @@ use Demo;
 	print 'su comisión es de ' + CAST(@comision as varchar)
 	GO
 
--- 8. Hacer un programa T SQL,que lea todos los datos de la tabla almacen y los muestre en pantalla ordenado por el nombre del almacen,  al final de la lista muestre la cantidad de almacenes existentes.
+/* 8. Hacer un programa T SQL,que lea todos los datos de la tabla almacen y los muestre en pantalla ordenado por 
+	  el nombre del almacen,  al final de la lista muestre la cantidad de almacenes existentes. */
+	Declare @cod_alma int
+	Declare @nomb_alma varchar(10)
+	Declare @ciud_alma varchar(10)
+	Declare @cantidad int = 0
 
--- 9. Hacer un programa T SQL,que lea los datos de la tabla sumi y muestre en pantalla solamente los productos suministrado por el proveedor PROV3, al finalizar la lista debe mostrar el importe total suministrado
+	-- Declaramos el cursor
+	DECLARE miCursor CURSOR
+		FOR (select calm, noma, ciud from alma)
+	-- Abrimos el cursor y navegamos
+	OPEN miCursor
+	FETCH NEXT FROM miCursor INTO @cod_alma, @nomb_alma, @ciud_alma;
+	
+	WHILE (@@FETCH_STATUS = 0)
+		BEGIN
+		print CAST(@cod_alma as varchar) + ' | ' + @nomb_alma + ' | ' + @ciud_alma;
+		set @cantidad = @cantidad + 1
+		FETCH NEXT FROM miCursor INTO @cod_alma, @nomb_alma, @ciud_alma;
+		END
+	print 'La cantidad de almacenes es: ' + CAST(@cantidad as varchar)
+	-- Cerramos el cursor
+	CLOSE miCursor
+	-- Limpiamos de la memoria al cursor
+	DEALLOCATE miCursor
 
--- 10. Hacer un programa T SQL,que lea los datos de la tabla sumi y muestre en pantalla solamente los productos suministrado en los almacenes de SC, al finalizar la lista debe mostrar el promedio de los importes suministrado 
+	--select * from alma
+	GO
 
--- 11. Hacer un programa T SQL,que lea los datos de la tabla sumi y muestre en pantalla solamente los productos suministrado de color ROJO,  al finalizar la lista debe mostrar la fecha del ultimo producto suministrado 
+/* 9. Hacer un programa T SQL,que lea los datos de la tabla sumi y muestre en pantalla solamente los productos 
+	  suministrado por el proveedor PROV3, al finalizar la lista debe mostrar el importe total suministrado. */
+	Declare @cod_prod int, 
+			@nomb_prod varchar(10),
+			@importe float,
+			@importeTotal float = 0
 
+	Declare Cursor2 cursor
+		for (select prod.cprd, prod.nomp, sumi.impt from sumi, prod, prov 
+			 where sumi.cprd = prod.cprd and sumi.cprv = prov.cprv and prov.nomb = 'PROV3')
 
+	open Cursor2
 
+	FETCH NEXT FROM Cursor2 INTO @cod_prod, @nomb_prod, @importe
+	WHILE ( @@FETCH_STATUS = 0 )
+		BEGIN
+			print CAST(@cod_prod as varchar) + ' | ' + @nomb_prod + ' | ' + CAST(@importe as varchar)
+			set @importeTotal = @importeTotal + @importe
+			FETCH NEXT FROM Cursor2 INTO @cod_prod, @nomb_prod, @importe
+		END
+	print 'El importe Total es: ' + CAST(@importeTotal as varchar)
+	-- cerramos el cursor
+	close Cursor2
+	-- liberamos de la memoria el cursor
+	deallocate Cursor2
+	GO
 
+/* 10. Hacer un programa T SQL,que lea los datos de la tabla sumi y muestre en pantalla solamente los 
+	   productos suministrado en los almacenes de SC, al finalizar la lista debe mostrar el promedio de 
+	   los importes suministrado. */
+	Declare @nombre_prod varchar(10),
+			@importe float = 0,
+			@cant_prod int = 0, 
+			@suma_importe float = 0,
+			@promedio_importe float
 
+	Declare Cursor3 cursor
+		for (select prod.nomp, sumi.impt from prod, sumi, alma where prod.cprd = sumi.cprd and sumi.calm = alma.calm 
+			 and alma.ciud = 'SC')
 
+	open Cursor3
 
+	FETCH NEXT FROM Cursor3 INTO @nombre_prod, @importe
+	WHILE ( @@FETCH_STATUS = 0 )
+		BEGIN
+			print @nombre_prod + ' | ' + CAST(@importe as varchar)
+			set @cant_prod = @cant_prod + 1
+			set @suma_importe = @suma_importe + @importe
+			FETCH NEXT FROM Cursor3 INTO @nombre_prod, @importe
+		END
+	set @promedio_importe = @suma_importe / @cant_prod
+	print 'El promedio de los importes suministrados es: ' + CAST(@promedio_importe as varchar)
 
+	close Cursor3
+	deallocate Cursor3
+	GO
 
+/* 11. Hacer un programa T SQL,que lea los datos de la tabla sumi y muestre en pantalla solamente los productos 
+	   suministrado de color ROJO,  al finalizar la lista debe mostrar la fecha del ultimo producto suministrado. */
+	Declare @nomb_prod varchar(10),
+			@fecha_ult_prod date = (select MAX(ftra) from prod, sumi where prod.cprd = sumi.cprd and prod.colo = 'ROJO')
 
+	Declare Cursor4 cursor
+		for (select prod.nomp from prod, sumi where prod.cprd = sumi.cprd and prod.colo = 'ROJO')
 
+	open Cursor4
+
+	FETCH NEXT FROM Cursor4 INTO @nomb_prod
+
+	WHILE (@@FETCH_STATUS = 0)
+		BEGIN 
+			print @nomb_prod
+			FETCH NEXT FROM Cursor4 INTO @nomb_prod
+		END
+	print 'Fecha del ultimo producto suministrado: ' + CAST(@fecha_ult_prod as varchar)
+
+	close Cursor4
+	deallocate Cursor4
+	GO
