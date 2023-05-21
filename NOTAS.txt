@@ -1,2 +1,0 @@
-Activar numero de lineas
-Tools/options../Text Editor/Trancs-SQL/General/activamos:Line numbers
