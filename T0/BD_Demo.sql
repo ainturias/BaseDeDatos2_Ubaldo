@@ -1,5 +1,4 @@
 -- Crear la Base de Datos "Demo" 
-
 create database Demo;
 
 -- Establecer como Base de Datos de uso
