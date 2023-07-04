@@ -120,7 +120,11 @@
 	GO
 	   
 --6. Hacer una funcion denominada "GetInven", que devuelva el Inventario Valorado de un producto.
+<<<<<<< HEAD
 	CREATE FUNCTION FN_GetInven (@cprd int)
+=======
+	CREATE FUNCTION FN_GetInven (@cprd integer)
+>>>>>>> ffe57aed4a2b52a58808f152cb7d1892f2a58955
 	RETURNS decimal(12,2)
 	AS
 	BEGIN
@@ -150,6 +154,11 @@
 	--eliminamos:
 	drop function FN_GetProdxCiud;
 	GO;
+
+	select * from prod
+	select * from sumi
+	select * from alma
+	select * from sumi where sumi.cprd = 1;
 
 --8. Hacer una funcion denominada "GetProvxProd", que devuelva en una tabla los Proveedores que suministraron algún Producto
 	CREATE FUNCTION FN_GetProvxProd ()
